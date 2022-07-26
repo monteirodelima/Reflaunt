@@ -1,74 +1,95 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/database/prisma.service';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../../database/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createUserDto: CreateUserDto) {
-    // check if role is valid
-    if (createUserDto.role !== 'admin' && createUserDto.role !== 'user') {
-      throw new Error('Invalid role');
+    // role != admin && role != user
+    if (
+      createUserDto.role !== 'admin' &&
+      createUserDto.role !== 'user' &&
+      createUserDto.role !== undefined &&
+      createUserDto.role !== null
+    ) {
+      throw new NotFoundException('Role not found');
     }
 
-    // check if email already exists
-    const emailExists = this.prisma.user.findFirstOrThrow({
+    // // check if email already exists
+    const emailExists = await this.prisma.user.findUnique({
       where: {
         email: createUserDto.email,
       },
     });
     if (emailExists) {
-      throw new Error('Email already exists');
-    }
-
-    // verify if address is valid
-    if (!createUserDto.address) {
-      throw new Error('Address is required');
-    }
-
-    // verify if password is valid
-    if (!createUserDto.password) {
-      throw new Error('Password is required');
-    }
-
-    // verify if name is valid
-    if (!createUserDto.name) {
-      throw new Error('Name is required');
-    }
-
-    // verify if email is valid
-    if (!createUserDto.email) {
-      throw new Error('Email is required');
+      throw new NotFoundException(
+        `Email ${createUserDto.email} already exists`,
+      );
     }
 
     // create user
     const user = await this.prisma.user.create({
-      data: {
-        email: createUserDto.email,
-        password: createUserDto.password,
-        name: createUserDto.name,
-        address: createUserDto.address,
-        role: createUserDto.role,
-      },
+      data: { ...createUserDto },
     });
 
     return user;
   }
-  findAll() {
-    return `This action returns all user`;
+  async findAll() {
+    const users = await this.prisma.user.findMany();
+    return users;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: string) {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        id: id,
+      },
+    });
+    return user;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    // check if user exists
+    const userExist = await this.prisma.user.findUnique({
+      where: {
+        id: id,
+      },
+    });
+    if (!userExist) {
+      throw new NotFoundException(`User with id ${id} not found`);
+    }
+
+    const user = await this.prisma.user.update({
+      where: { id: id },
+      data: {
+        password: updateUserDto.password,
+        address: updateUserDto.address,
+      },
+    });
+    return user;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: string) {
+    // check if user exists
+    const userExist = await this.prisma.user.findUnique({
+      where: {
+        id: id,
+      },
+    });
+    if (!userExist) {
+      throw new NotFoundException('User not found');
+    }
+
+    const user = await this.prisma.user.delete({
+      where: {
+        id: id,
+      },
+    });
+
+    return user;
   }
 }

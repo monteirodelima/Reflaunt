@@ -12,29 +12,41 @@ datasource db {
 
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  name      String?
-  address   String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-  role     String @default("user") 
-  Purchase   Purchase[]
+  id              String   @id @default(uuid())
+  email           String   @unique
+  password        String
+  first_name      String?
+  last_name       String?
+  address         String?
+  role            String @default("user") 
+  order           Order[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now())
+}
+
+
+model User_Payment {
+  id              String   @id @default(uuid())
+  user_id         String   @unique
+  payment_id      String   @unique
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now())
 }
 
 model Product {
   id                 String     @id @default(uuid())
   name               String     @unique
   urlName            String     @unique
+  description        String?
+  size               String?
+  color              String?
   picture            String?
   basePrice          Decimal
   discountPercentage Int        @default(0)
   stock              Int        @default(0)
-  description        String?
   createdAt          DateTime   @default(now())
   categories         Category[]
-  Purchase           Purchase[]
+  order              Order[]
 }
 
 model Category {
@@ -43,14 +55,14 @@ model Category {
   products Product[]
 }
 
-model Purchase {
-  id String @id @default(uuid())
+model Order {
+  id            String @id @default(uuid())
 
-  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
-  userId String?
+  user          User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId        String?
 
-  product   Product @relation(fields: [productId], references: [id])
-  productId String
+  product       Product @relation(fields: [productId], references: [id])
+  productId     String
 
   amount        Int      @default(1)
   totalPrice    Decimal
