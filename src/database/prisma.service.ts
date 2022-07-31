@@ -3,6 +3,9 @@ import { PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
+  static getUser(authorization: string) {
+    throw new Error('Method not implemented.');
+  }
   async onModuleInit() {
     await this.$connect();
   }

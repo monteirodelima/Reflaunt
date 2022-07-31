@@ -57,5 +57,4 @@ export class User implements Prisma.UserUncheckedCreateInput {
    * User updatedAt dateString
    * @example "2022-03-26T15:41:28.527Z"
    */
-  updatedAt?: string | Date;
 }

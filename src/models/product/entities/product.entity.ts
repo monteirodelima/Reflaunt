@@ -1,5 +1,4 @@
 import { Prisma } from '@prisma/client';
-import { IsNotEmpty } from 'class-validator';
 
 /** Describes the properties of a Product in the database */
 export class Product implements Prisma.ProductUncheckedCreateInput {
@@ -20,6 +19,24 @@ export class Product implements Prisma.ProductUncheckedCreateInput {
    * @example "brand-black-wheelchair"
    */
   urlName: string;
+
+  /**
+   * Product description
+   * @example "Black wheelchair for offices"
+   */
+  description?: string;
+
+  /**
+   * Product size
+   * @example "M"
+   */
+  size?: string;
+
+  /**
+   * Product color
+   * @example "Black"
+   */
+  color?: string;
 
   /**
    * Product picture
@@ -45,12 +62,6 @@ export class Product implements Prisma.ProductUncheckedCreateInput {
    * @example 42
    */
   stock?: number;
-
-  /**
-   * Product description
-   * @example "Black wheelchair for offices"
-   */
-  description?: string;
 
   /**
    * Product createdAt dateString

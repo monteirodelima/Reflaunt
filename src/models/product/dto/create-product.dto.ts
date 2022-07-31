@@ -1,13 +1,4 @@
-import { prisma } from '@prisma/client';
-import {
-  IsEmail,
-  IsNotEmpty,
-  IsString,
-  IsInt,
-  Min,
-  IsOptional,
-} from 'class-validator';
-import { PrismaService } from 'src/database/prisma.service';
+import { IsNotEmpty, IsString, IsInt, Min, IsOptional } from 'class-validator';
 
 export class CreateProductDto {
   @IsString()
